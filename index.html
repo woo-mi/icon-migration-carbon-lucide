@@ -142,9 +142,15 @@
     padding: 20px 32px 80px;
   }
 
+  .table-scroll {
+    overflow-x: auto;
+  }
+
   table {
     width: 100%;
+    min-width: 1400px;
     border-collapse: collapse;
+    table-layout: fixed;
   }
 
   thead th {
@@ -293,6 +299,7 @@
 </header>
 
 <main>
+  <div class="table-scroll">
   <table>
     <thead>
       <tr>
@@ -8585,6 +8592,7 @@
       </tr>
     </tbody>
   </table>
+  </div>
   <div class="empty-state" id="empty-state">No icons match &ldquo;<span id="empty-query"></span>&rdquo;.</div>
 </main>
 
