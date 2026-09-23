@@ -72,7 +72,7 @@
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 12px;
-    max-width: 1180px;
+    max-width: 1600px;
     margin: 0 auto;
   }
 
@@ -95,7 +95,7 @@
   .stats b { color: var(--text); font-weight: 600; }
 
   .controls {
-    max-width: 1180px;
+    max-width: 1600px;
     margin: 16px auto 0;
     display: flex;
     gap: 10px;
@@ -137,23 +137,20 @@
   }
 
   main {
-    max-width: 1180px;
+    max-width: 1600px;
     margin: 0 auto;
     padding: 20px 32px 80px;
   }
 
-  .table-scroll {
-    overflow-x: auto;
-  }
-
   table {
     width: 100%;
-    min-width: 1400px;
     border-collapse: collapse;
     table-layout: fixed;
   }
 
   thead th {
+    position: sticky;
+    top: 97px;
     background: var(--bg);
     text-align: left;
     font-size: 11px;
@@ -263,7 +260,7 @@
   .chip-empty { color: var(--text-faint); font-style: italic; }
 
   footer {
-    max-width: 1180px;
+    max-width: 1600px;
     margin: 0 auto;
     padding: 0 32px 60px;
     color: var(--text-faint);
@@ -297,7 +294,6 @@
 </header>
 
 <main>
-  <div class="table-scroll">
   <table>
     <thead>
       <tr>
@@ -8590,7 +8586,6 @@
       </tr>
     </tbody>
   </table>
-  </div>
   <div class="empty-state" id="empty-state">No icons match &ldquo;<span id="empty-query"></span>&rdquo;.</div>
 </main>
 
