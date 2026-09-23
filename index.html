@@ -7,7 +7,8 @@
 <style>
   :root {
     --bg: #ffffff;
-    --surface: #f7f7f5;
+    --surface: #ffffff;
+    --hover: #f5f4f2;
     --border: #e6e4e0;
     --border-soft: #eeece8;
     --text: #1f1d1a;
@@ -29,6 +30,7 @@
     :root {
       --bg: #161513;
       --surface: #1e1c19;
+      --hover: #221f1b;
       --border: #322f2a;
       --border-soft: #2a2824;
       --text: #f1efeb;
@@ -167,7 +169,7 @@
     transition: background 0.1s ease;
   }
 
-  tbody tr.row:hover { background: var(--surface); }
+  tbody tr.row:hover { background: var(--hover); }
 
   tbody tr.row-no-equiv { background: var(--warn-bg); }
   tbody tr.row-no-equiv:hover { background: var(--warn-bg); filter: brightness(0.97); }
