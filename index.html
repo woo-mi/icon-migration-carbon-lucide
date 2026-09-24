@@ -8785,6 +8785,11 @@
     functionsMode ? renderFunctions() : renderOriginal();
   });
 
+  // Functions view is the default on load
+  functionsMode = true;
+  toggleFunctions.classList.add('active');
+  renderFunctions();
+
   search.addEventListener('input', applyFilters);
   toggleNoEquiv.addEventListener('click', () => {
     onlyNoEquiv = !onlyNoEquiv;
