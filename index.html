@@ -8673,16 +8673,23 @@
     return tr;
   }
 
+  function centralGlyphKey(row) {
+    const svg = row.querySelector('td.col-central svg');
+    return svg ? svg.innerHTML.replace(/\s+/g, '') : '';
+  }
+
   function renderFunctions() {
-    const byLabel = new Map();
+    const byGlyph = new Map();
     rows.forEach(r => {
-      const key = centralLabel(r);
-      if (!byLabel.has(key)) byLabel.set(key, []);
-      byLabel.get(key).push(r);
+      const key = centralGlyphKey(r);
+      if (!byGlyph.has(key)) byGlyph.set(key, []);
+      byGlyph.get(key).push(r);
     });
     const shared = [], unique = [], none = [];
-    byLabel.forEach((rs, label) => {
-      if (!label) none.push(...rs);
+    byGlyph.forEach((rs, key) => {
+      const labels = Array.from(new Set(rs.map(centralLabel).filter(Boolean)));
+      const label = labels.join(' / ') || '(unlabeled)';
+      if (!key) none.push(...rs);
       else if (rs.length > 1) shared.push([label, rs]);
       else unique.push([label, rs[0]]);
     });
