@@ -465,7 +465,7 @@
           <div class="swatch-group"><span class="swatch swatch-own" title="Our own &middot; CarbonCloseFilledIcon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" class="glyph glyph-own preview-icon"><path d="M15 9L9 15M15 15L9 9M21.25 12C21.25 17.1086 17.1086 21.25 12 21.25C6.89137 21.25 2.75 17.1086 2.75 12C2.75 6.89137 6.89137 2.75 12 2.75C17.1086 2.75 21.25 6.89137 21.25 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg></span><code class="name">CircleXIcon</code></div>
         </td>
       </tr>
-<tr class="row" data-search="carboncloseicon xicon" data-no-equiv="false">
+<tr class="row" data-fn-after="CircleXIcon" data-search="carboncloseicon xicon" data-no-equiv="false">
         <td class="col-names">
           <code class="name name-carbon">CarbonCloseIcon</code>
           <span class="arrow">&#8594;</span>
@@ -8689,16 +8689,23 @@
     byGlyph.forEach((rs, key) => {
       const labels = Array.from(new Set(rs.map(centralLabel).filter(Boolean)));
       const label = labels.join(' / ') || '(unlabeled)';
-      if (!key) none.push(...rs);
+      const free = rs.filter(r => !r.dataset.fnAfter);
+      if (!key) none.push(...free);
       else if (rs.length > 1) shared.push([label, rs]);
-      else unique.push([label, rs[0]]);
+      else if (free.length) unique.push([label, free[0]]);
     });
     shared.sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]));
     unique.sort((a, b) => a[0].localeCompare(b[0]));
+    const pinned = rows.filter(r => r.dataset.fnAfter);
+    const pinnedSet = new Set(pinned);
     tbody.textContent = '';
     shared.forEach(([label, rs]) => {
-      tbody.appendChild(makeGroupRow(label + ' \u00b7 ' + rs.length + ' rows'));
-      rs.forEach(r => tbody.appendChild(r));
+      const own = rs.filter(r => !pinnedSet.has(r));
+      tbody.appendChild(makeGroupRow(label + ' \u00b7 ' + own.length + ' rows'));
+      own.forEach(r => tbody.appendChild(r));
+      pinned.forEach(p => {
+        if (label.split(' / ').includes(p.dataset.fnAfter)) tbody.appendChild(p);
+      });
     });
     if (unique.length) {
       tbody.appendChild(makeGroupRow('Unique picks'));
