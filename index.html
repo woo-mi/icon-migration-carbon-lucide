@@ -302,7 +302,6 @@
   <div class="controls">
     <input id="search" type="text" placeholder="Filter by icon name&hellip;" autocomplete="off" />
     <div id="toggle-no-equiv" class="toggle">No-equivalent only</div>
-    <div id="toggle-functions" class="toggle">Functions</div>
   </div>
 </header>
 
@@ -8694,9 +8693,7 @@
   }
 
   const tbody = document.getElementById('table-body');
-  const toggleFunctions = document.getElementById('toggle-functions');
   const originalOrder = Array.from(tbody.children);
-  let functionsMode = false;
 
   function centralLabel(row) {
     const el = row.querySelector('td.col-central .name');
@@ -8774,21 +8771,7 @@
     applyFilters();
   }
 
-  function renderOriginal() {
-    tbody.textContent = '';
-    originalOrder.forEach(el => tbody.appendChild(el));
-    applyFilters();
-  }
-
-  toggleFunctions.addEventListener('click', () => {
-    functionsMode = !functionsMode;
-    toggleFunctions.classList.toggle('active', functionsMode);
-    functionsMode ? renderFunctions() : renderOriginal();
-  });
-
-  // Functions view is the default on load
-  functionsMode = true;
-  toggleFunctions.classList.add('active');
+  // Functions view is the only view
   renderFunctions();
 
   search.addEventListener('input', applyFilters);
