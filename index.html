@@ -319,7 +319,7 @@
       </tr>
     </thead>
     <tbody id="table-body">
-      <tr class="group-row"><td colspan="6">Agent</td></tr>
+      <tr class="group-row" data-curated><td colspan="6">Agent</td></tr>
 <tr class="row" data-search="carbonaiagentinvocationicon botmessagesquareicon" data-no-equiv="false">
         <td class="col-names">
           <code class="name name-carbon">CarbonAiAgentInvocationIcon</code>
@@ -425,7 +425,7 @@
 <rect x="16.8821" y="9" width="1.8" height="1.8" rx="0.9" transform="rotate(29.3431 16.8821 9)" fill="currentColor"/></svg></span><code class="name">AgentIcon</code></div>
         </td>
       </tr>
-      <tr class="group-row"><td colspan="6">Chart</td></tr>
+      <tr class="group-row" data-curated><td colspan="6">Chart</td></tr>
 <tr class="row" data-search="carbonchartbaricon chartbaricon" data-no-equiv="false">
         <td class="col-names">
           <code class="name name-carbon">CarbonChartBarIcon</code>
@@ -8696,8 +8696,20 @@
   }
 
   function renderFunctions() {
+    const curated = [];
+    let cur = null;
+    originalOrder.forEach(el => {
+      if (el.classList.contains('group-row')) {
+        cur = el.dataset.curated !== undefined ? { header: el, rows: [] } : null;
+        if (cur) curated.push(cur);
+      } else if (cur) {
+        cur.rows.push(el);
+      }
+    });
+    const curatedRows = new Set();
+    curated.forEach(c => c.rows.forEach(r => curatedRows.add(r)));
     const byGlyph = new Map();
-    rows.forEach(r => {
+    rows.filter(r => !curatedRows.has(r)).forEach(r => {
       const key = centralGlyphKey(r);
       if (!byGlyph.has(key)) byGlyph.set(key, []);
       byGlyph.get(key).push(r);
@@ -8713,9 +8725,13 @@
     });
     shared.sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]));
     unique.sort((a, b) => a[0].localeCompare(b[0]));
-    const pinned = rows.filter(r => r.dataset.fnAfter);
+    const pinned = rows.filter(r => r.dataset.fnAfter && !curatedRows.has(r));
     const pinnedSet = new Set(pinned);
     tbody.textContent = '';
+    curated.forEach(c => {
+      tbody.appendChild(c.header);
+      c.rows.forEach(r => tbody.appendChild(r));
+    });
     shared.forEach(([label, rs]) => {
       const own = rs.filter(r => !pinnedSet.has(r));
       tbody.appendChild(makeGroupRow(label + ' \u00b7 ' + own.length + ' rows'));
