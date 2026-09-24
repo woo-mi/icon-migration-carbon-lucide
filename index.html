@@ -302,6 +302,7 @@
   <div class="controls">
     <input id="search" type="text" placeholder="Filter by icon name&hellip;" autocomplete="off" />
     <div id="toggle-no-equiv" class="toggle">No-equivalent only</div>
+    <div id="toggle-functions" class="toggle">Functions</div>
   </div>
 </header>
 
@@ -8651,6 +8652,69 @@
     emptyState.style.display = visible === 0 ? 'block' : 'none';
     emptyQuery.textContent = q;
   }
+
+  const tbody = document.getElementById('table-body');
+  const toggleFunctions = document.getElementById('toggle-functions');
+  const originalOrder = Array.from(tbody.children);
+  let functionsMode = false;
+
+  function centralLabel(row) {
+    const el = row.querySelector('td.col-central .name');
+    return el ? el.textContent.trim() : '';
+  }
+
+  function makeGroupRow(text) {
+    const tr = document.createElement('tr');
+    tr.className = 'group-row';
+    const td = document.createElement('td');
+    td.colSpan = 6;
+    td.textContent = text;
+    tr.appendChild(td);
+    return tr;
+  }
+
+  function renderFunctions() {
+    const byLabel = new Map();
+    rows.forEach(r => {
+      const key = centralLabel(r);
+      if (!byLabel.has(key)) byLabel.set(key, []);
+      byLabel.get(key).push(r);
+    });
+    const shared = [], unique = [], none = [];
+    byLabel.forEach((rs, label) => {
+      if (!label) none.push(...rs);
+      else if (rs.length > 1) shared.push([label, rs]);
+      else unique.push([label, rs[0]]);
+    });
+    shared.sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]));
+    unique.sort((a, b) => a[0].localeCompare(b[0]));
+    tbody.textContent = '';
+    shared.forEach(([label, rs]) => {
+      tbody.appendChild(makeGroupRow(label + ' \u00b7 ' + rs.length + ' rows'));
+      rs.forEach(r => tbody.appendChild(r));
+    });
+    if (unique.length) {
+      tbody.appendChild(makeGroupRow('Unique picks'));
+      unique.forEach(([, r]) => tbody.appendChild(r));
+    }
+    if (none.length) {
+      tbody.appendChild(makeGroupRow('No Iconsist icon'));
+      none.forEach(r => tbody.appendChild(r));
+    }
+    applyFilters();
+  }
+
+  function renderOriginal() {
+    tbody.textContent = '';
+    originalOrder.forEach(el => tbody.appendChild(el));
+    applyFilters();
+  }
+
+  toggleFunctions.addEventListener('click', () => {
+    functionsMode = !functionsMode;
+    toggleFunctions.classList.toggle('active', functionsMode);
+    functionsMode ? renderFunctions() : renderOriginal();
+  });
 
   search.addEventListener('input', applyFilters);
   toggleNoEquiv.addEventListener('click', () => {
