@@ -58,9 +58,6 @@
   }
 
   header {
-    position: sticky;
-    top: 0;
-    z-index: 20;
     background: var(--bg);
     padding: 28px 32px 36px;
   }
@@ -148,8 +145,6 @@
   }
 
   thead th {
-    position: sticky;
-    top: 97px;
     background: var(--bg);
     text-align: left;
     font-size: 11px;
@@ -8743,14 +8738,6 @@
     }
     applyFilters();
   }
-
-  // keep the sticky column header glued to the real header height
-  function syncStickyOffset() {
-    const h = document.querySelector('header').offsetHeight;
-    document.querySelectorAll('thead th').forEach(th => th.style.top = h + 'px');
-  }
-  window.addEventListener('resize', syncStickyOffset);
-  syncStickyOffset();
 
   // Functions view is the only view
   renderFunctions();
