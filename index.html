@@ -8720,7 +8720,7 @@
     unique.sort((a, b) => a[0].localeCompare(b[0]));
     const pinned = rows.filter(r => r.dataset.fnAfter && !curatedRows.has(r));
     const pinnedSet = new Set(pinned);
-    const GROUP_TITLES = { 'EyeOpenIcon': 'View/Preview' };
+    const GROUP_TITLES = { 'EyeOpenIcon': 'View/Preview', 'PencilIcon': 'Edit' };
     tbody.textContent = '';
     curated.forEach(c => {
       tbody.appendChild(c.header);
