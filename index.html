@@ -301,7 +301,6 @@
   </div>
   <div class="controls">
     <input id="search" type="text" placeholder="Filter by icon name&hellip;" autocomplete="off" />
-    <div id="toggle-no-equiv" class="toggle">No-equivalent only</div>
   </div>
 </header>
 
@@ -8669,20 +8668,15 @@
 
 <script>
   const search = document.getElementById('search');
-  const toggleNoEquiv = document.getElementById('toggle-no-equiv');
   const rows = Array.from(document.querySelectorAll('#table-body tr.row'));
   const emptyState = document.getElementById('empty-state');
   const emptyQuery = document.getElementById('empty-query');
-
-  let onlyNoEquiv = false;
 
   function applyFilters() {
     const q = search.value.trim().toLowerCase();
     let visible = 0;
     rows.forEach(row => {
-      const matchesQuery = !q || row.dataset.search.includes(q);
-      const matchesEquiv = !onlyNoEquiv || row.dataset.noEquiv === 'true';
-      const show = matchesQuery && matchesEquiv;
+      const show = !q || row.dataset.search.includes(q);
       row.classList.toggle('row-hidden', !show);
       if (show) visible++;
     });
@@ -8781,11 +8775,6 @@
   renderFunctions();
 
   search.addEventListener('input', applyFilters);
-  toggleNoEquiv.addEventListener('click', () => {
-    onlyNoEquiv = !onlyNoEquiv;
-    toggleNoEquiv.classList.toggle('active', onlyNoEquiv);
-    applyFilters();
-  });
 </script>
 
 </body>
