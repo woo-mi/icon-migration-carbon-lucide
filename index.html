@@ -8720,6 +8720,7 @@
     unique.sort((a, b) => a[0].localeCompare(b[0]));
     const pinned = rows.filter(r => r.dataset.fnAfter && !curatedRows.has(r));
     const pinnedSet = new Set(pinned);
+    const GROUP_TITLES = { 'EyeOpenIcon': 'View/Preview' };
     tbody.textContent = '';
     curated.forEach(c => {
       tbody.appendChild(c.header);
@@ -8727,7 +8728,8 @@
     });
     shared.forEach(([label, rs]) => {
       const own = rs.filter(r => !pinnedSet.has(r));
-      tbody.appendChild(makeGroupRow(label + ' \u00b7 ' + own.length + ' rows'));
+      const custom = label.split(' / ').map(l => GROUP_TITLES[l]).find(Boolean);
+      tbody.appendChild(makeGroupRow(custom || (label + ' \u00b7 ' + own.length + ' rows')));
       own.forEach(r => tbody.appendChild(r));
       pinned.forEach(p => {
         if (label.split(' / ').includes(p.dataset.fnAfter)) tbody.appendChild(p);
