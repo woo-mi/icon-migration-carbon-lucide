@@ -8780,6 +8780,14 @@
     applyFilters();
   }
 
+  // keep the sticky column header glued to the real header height
+  function syncStickyOffset() {
+    const h = document.querySelector('header').offsetHeight;
+    document.querySelectorAll('thead th').forEach(th => th.style.top = h + 'px');
+  }
+  window.addEventListener('resize', syncStickyOffset);
+  syncStickyOffset();
+
   // Functions view is the only view
   renderFunctions();
 
