@@ -354,8 +354,7 @@
   }
   .gallery-cell:hover { background: var(--surface); }
   .gallery-cell { cursor: pointer; }
-  @keyframes row-flash { 0%, 40% { background: var(--accent-soft); } 100% { background: transparent; } }
-  tr.row-flash > td { animation: row-flash 2.4s ease-out; }
+  tbody tr.row.row-flash { background: var(--hover); }
   .gallery-cell svg { width: 24px; height: 24px; }
   .gallery-tip {
     position: absolute;
@@ -8939,11 +8938,12 @@
     const first = targets[0];
     const stickyH = document.querySelector('header').offsetHeight + document.querySelector('thead').offsetHeight;
     window.scrollTo({ top: first.getBoundingClientRect().top + scrollY - stickyH - 24, behavior: 'smooth' });
-    targets.forEach(r => {
-      r.classList.remove('row-flash');
-      void r.offsetWidth;
-      r.classList.add('row-flash');
-    });
+    document.querySelectorAll('tr.row-flash').forEach(r => r.classList.remove('row-flash'));
+    targets.forEach(r => r.classList.add('row-flash'));
+    // hold the hover look until the pointer moves; then real :hover takes over
+    setTimeout(() => document.addEventListener('mousemove', () => {
+      targets.forEach(r => r.classList.remove('row-flash'));
+    }, { once: true }), 300);
   }
   segBtns.forEach(btn => btn.addEventListener('click', () => {
     document.body.classList.toggle('gallery-view', btn.dataset.view === 'gallery');
