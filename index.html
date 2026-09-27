@@ -288,8 +288,33 @@
 
   /* search beside stats */
   .header-right { display: flex; align-items: center; gap: 20px; }
-  .header-right #search { width: 260px; }
-  .header-right .toggle { padding: 8px; flex-shrink: 0; }
+  .header-right #search { width: 180px; flex: none; }
+  .segmented {
+    display: inline-flex;
+    flex-shrink: 0;
+    padding: 2px;
+    gap: 2px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--accent-soft);
+  }
+  .seg-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 8px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .seg-btn:hover { color: var(--text); }
+  .seg-btn.active {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 2px rgba(0,0,0,.08);
+  }
 
   /* gallery view: unique Iconists picks */
   #gallery { display: none; }
@@ -353,7 +378,7 @@
         <span>Stroke 1.5 &middot; Radius 2 medium &middot; Join round</span>
       </div>
       <input id="search" type="text" placeholder="Filter by icon name&hellip;" autocomplete="off" />
-      <button id="gallery-toggle" class="toggle" aria-label="Gallery" title="Show only the icons picked in the Iconists column, as a grid"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="14" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect></svg></button>
+      <div class="segmented" role="radiogroup" aria-label="View"><button type="button" class="seg-btn active" data-view="list" role="radio" aria-checked="true" aria-label="List view" title="List view"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h.01"></path><path d="M3 12h.01"></path><path d="M3 19h.01"></path><path d="M8 5h13"></path><path d="M8 12h13"></path><path d="M8 19h13"></path></svg></button><button type="button" class="seg-btn" data-view="gallery" role="radio" aria-checked="false" aria-label="Gallery view" title="Show only the icons picked in the Iconists column, as a grid"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="14" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect></svg></button></div>
     </div>
   </div>
 </header>
@@ -8811,7 +8836,7 @@
   renderFunctions();
 
   // gallery: every unique glyph in the Iconists column, deduped by SVG geometry
-  const galleryToggle = document.getElementById('gallery-toggle');
+  const segBtns = document.querySelectorAll('.seg-btn');
   const galleryGrid = document.getElementById('gallery-grid');
   (function buildGallery() {
     const seen = new Map();
@@ -8884,10 +8909,14 @@
     document.getElementById('gallery-count').textContent =
       cells.length + ' unique icons from the Iconists and Customized columns, across ' + rowCount + ' rows';
   })();
-  galleryToggle.addEventListener('click', () => {
-    const on = document.body.classList.toggle('gallery-view');
-    galleryToggle.classList.toggle('active', on);
-  });
+  segBtns.forEach(btn => btn.addEventListener('click', () => {
+    document.body.classList.toggle('gallery-view', btn.dataset.view === 'gallery');
+    segBtns.forEach(b => {
+      const on = b === btn;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-checked', on);
+    });
+  }));
 
   search.addEventListener('input', applyFilters);
 </script>
