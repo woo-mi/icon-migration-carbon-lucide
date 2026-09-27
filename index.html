@@ -353,6 +353,9 @@
     color: var(--text);
   }
   .gallery-cell:hover { background: var(--surface); }
+  .gallery-cell { cursor: pointer; }
+  @keyframes row-flash { 0%, 40% { background: var(--accent-soft); } 100% { background: transparent; } }
+  tr.row-flash > td { animation: row-flash 2.4s ease-out; }
   .gallery-cell svg { width: 24px; height: 24px; }
   .gallery-tip {
     position: absolute;
@@ -8860,7 +8863,8 @@
       if (svgs.length) rowCount++;
       svgs.forEach(svg => {
         const key = svg.innerHTML.replace(/\s+/g, '');
-        if (!seen.has(key)) seen.set(key, { svg, labels: new Set(), carbons: new Set() });
+        if (!seen.has(key)) seen.set(key, { svg, labels: new Set(), carbons: new Set(), rows: new Set() });
+        seen.get(key).rows.add(r);
         const label = svg.closest('td').querySelector('.name');
         if (label) seen.get(key).labels.add(label.textContent.trim());
         const carbon = r.querySelector('code.name-carbon');
@@ -8871,6 +8875,7 @@
       label: Array.from(e.labels).join(' / ') || '(unlabeled)',
       carbon: Array.from(e.carbons).join(' / ') || '—',
       svg: e.svg,
+      rows: Array.from(e.rows),
     }));
     cells.sort((a, b) => a.label.localeCompare(b.label));
     // clones must not share ids with the table originals: url(#id) refs (masks, clips)
@@ -8918,11 +8923,28 @@
         else if (rect.right > innerWidth - pad) dx = innerWidth - pad - rect.right;
         if (dx) tip.style.transform = 'translateX(calc(-50% + ' + dx + 'px))';
       });
+      div.addEventListener('click', () => revealRows(c.rows));
       galleryGrid.appendChild(div);
     });
     document.getElementById('gallery-count').textContent =
       cells.length + ' unique icons from the Iconists and Customized columns, across ' + rowCount + ' rows';
   })();
+  // grid → list: jump to the row(s) that use the clicked glyph and flash them
+  function revealRows(targets) {
+    if (targets.some(r => r.classList.contains('row-hidden'))) {
+      search.value = '';
+      applyFilters();
+    }
+    document.querySelector('.seg-btn[data-view="list"]').click();
+    const first = targets[0];
+    const stickyH = document.querySelector('header').offsetHeight + document.querySelector('thead').offsetHeight;
+    window.scrollTo({ top: first.getBoundingClientRect().top + scrollY - stickyH - 24, behavior: 'smooth' });
+    targets.forEach(r => {
+      r.classList.remove('row-flash');
+      void r.offsetWidth;
+      r.classList.add('row-flash');
+    });
+  }
   segBtns.forEach(btn => btn.addEventListener('click', () => {
     document.body.classList.toggle('gallery-view', btn.dataset.view === 'gallery');
     segBtns.forEach(b => {
