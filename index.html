@@ -315,6 +315,28 @@
   }
   .gallery-cell:hover { background: var(--surface); }
   .gallery-cell svg { width: 24px; height: 24px; }
+  .gallery-tip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--text);
+    color: var(--bg);
+    font-size: 11px;
+    line-height: 1.6;
+    padding: 6px 10px;
+    border-radius: 6px;
+    width: max-content;
+    max-width: 300px;
+    text-align: left;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .12s;
+    z-index: 30;
+  }
+  .gallery-cell { position: relative; }
+  .gallery-cell:hover .gallery-tip { opacity: 1; }
+  .gallery-tip .tip-key { display: inline-block; width: 56px; opacity: .65; }
 </style>
 </head>
 <body>
@@ -8798,12 +8820,18 @@
       if (svgs.length) rowCount++;
       svgs.forEach(svg => {
         const key = svg.innerHTML.replace(/\s+/g, '');
-        if (!seen.has(key)) seen.set(key, { svg, labels: new Set() });
+        if (!seen.has(key)) seen.set(key, { svg, labels: new Set(), carbons: new Set() });
         const label = svg.closest('td').querySelector('.name');
         if (label) seen.get(key).labels.add(label.textContent.trim());
+        const carbon = r.querySelector('code.name-carbon');
+        if (carbon) seen.get(key).carbons.add(carbon.textContent.trim());
       });
     });
-    const cells = Array.from(seen.values(), e => ({ label: Array.from(e.labels).join(' / ') || '(unlabeled)', svg: e.svg }));
+    const cells = Array.from(seen.values(), e => ({
+      label: Array.from(e.labels).join(' / ') || '(unlabeled)',
+      carbon: Array.from(e.carbons).join(' / ') || '—',
+      svg: e.svg,
+    }));
     cells.sort((a, b) => a.label.localeCompare(b.label));
     // clones must not share ids with the table originals: url(#id) refs (masks, clips)
     // resolve to the first id in the document, which sits in the hidden table and renders as nothing
@@ -8827,9 +8855,29 @@
     cells.forEach(c => {
       const div = document.createElement('div');
       div.className = 'gallery-cell';
-      div.title = c.label;
-      div.dataset.search = c.label.toLowerCase();
+      div.dataset.search = (c.label + ' ' + c.carbon).toLowerCase();
       div.appendChild(cloneSvg(c.svg));
+      const tip = document.createElement('div');
+      tip.className = 'gallery-tip';
+      [['Carbon', c.carbon], ['Iconists', c.label]].forEach(([k, v]) => {
+        const line = document.createElement('div');
+        const keyEl = document.createElement('span');
+        keyEl.className = 'tip-key';
+        keyEl.textContent = k;
+        line.appendChild(keyEl);
+        line.appendChild(document.createTextNode(v));
+        tip.appendChild(line);
+      });
+      div.appendChild(tip);
+      // keep the tooltip inside the viewport when the cell sits near an edge
+      div.addEventListener('mouseenter', () => {
+        tip.style.transform = 'translateX(-50%)';
+        const rect = tip.getBoundingClientRect(), pad = 8;
+        let dx = 0;
+        if (rect.left < pad) dx = pad - rect.left;
+        else if (rect.right > innerWidth - pad) dx = innerWidth - pad - rect.right;
+        if (dx) tip.style.transform = 'translateX(calc(-50% + ' + dx + 'px))';
+      });
       galleryGrid.appendChild(div);
     });
     document.getElementById('gallery-count').textContent =
