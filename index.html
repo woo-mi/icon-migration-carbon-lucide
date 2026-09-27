@@ -8805,12 +8805,31 @@
     });
     const cells = Array.from(seen.values(), e => ({ label: Array.from(e.labels).join(' / ') || '(unlabeled)', svg: e.svg }));
     cells.sort((a, b) => a.label.localeCompare(b.label));
+    // clones must not share ids with the table originals: url(#id) refs (masks, clips)
+    // resolve to the first id in the document, which sits in the hidden table and renders as nothing
+    let uid = 0;
+    function cloneSvg(svg) {
+      const c = svg.cloneNode(true);
+      const idEls = c.querySelectorAll('[id]');
+      if (idEls.length) {
+        const suffix = '-gal' + (++uid);
+        idEls.forEach(el => el.id += suffix);
+        c.querySelectorAll('*').forEach(el => {
+          for (const attr of el.attributes) {
+            if (attr.value.includes('url(#')) {
+              attr.value = attr.value.replace(/url\(#([^)]+)\)/g, (m, id) => 'url(#' + id + suffix + ')');
+            }
+          }
+        });
+      }
+      return c;
+    }
     cells.forEach(c => {
       const div = document.createElement('div');
       div.className = 'gallery-cell';
       div.title = c.label;
       div.dataset.search = c.label.toLowerCase();
-      div.appendChild(c.svg.cloneNode(true));
+      div.appendChild(cloneSvg(c.svg));
       galleryGrid.appendChild(div);
     });
     document.getElementById('gallery-count').textContent =
