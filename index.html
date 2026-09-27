@@ -286,10 +286,8 @@
   }
   tr.group-row.row-hidden { display: none; }
 
-  /* subtitle + search beside stats */
-  .subtitle { margin-top: 28px; font-size: 14px; color: var(--text); }
-  .header-top { align-items: flex-end; }
-  .header-right { display: flex; align-items: center; gap: 20px; transform: translateY(16px); }
+  /* search beside stats */
+  .header-right { display: flex; align-items: center; gap: 20px; }
   .header-right #search { width: 260px; }
 </style>
 </head>
@@ -299,11 +297,11 @@
   <div class="header-top">
     <div class="title-block">
       <h1>Icon Migration<span class="dim">,</span> Carbon <span class="dim">&rarr;</span> Lucide <span class="dim">&rarr;</span> Iconists</h1>
-      <div class="subtitle">Stroke 1.5 &middot; Radius 2 medium &middot; Join round</div>
     </div>
     <div class="header-right">
       <div class="stats">
         <span>284 icons in use</span>
+        <span>Stroke 1.5 &middot; Radius 2 medium &middot; Join round</span>
       </div>
       <input id="search" type="text" placeholder="Filter by icon name&hellip;" autocomplete="off" />
     </div>
