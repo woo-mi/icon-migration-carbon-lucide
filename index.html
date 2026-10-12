@@ -9378,7 +9378,7 @@
     b.setAttribute('role', 'menuitemradio');
     b.dataset.mode = mode;
     b.innerHTML = '<svg class="menu-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>';
-    b.appendChild(document.createTextNode(text));
+    b.appendChild(document.createTextNode(text.charAt(0).toUpperCase() + text.slice(1)));
     if (count !== undefined) {
       const c = document.createElement('span');
       c.className = 'menu-count';
