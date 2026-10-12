@@ -24,6 +24,7 @@
     --track-bg: #eeece7;
     --check-red: #dc2626;
     --check-red-border: #fecaca;
+    --check-red-soft: #fef2f2;
     --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
     --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   }
@@ -47,6 +48,7 @@
       --chip-text: #a39c91;
       --check-red: #f87171;
       --check-red-border: #5c2323;
+      --check-red-soft: #2a1616;
       --track-bg: #29271f;
     }
   }
@@ -338,6 +340,24 @@
     cursor: pointer;
   }
   .seg-btn:hover { color: var(--seg-icon-active); }
+  .check-filter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #e5e5e5;
+    background: var(--surface);
+    color: var(--check-red);
+    cursor: pointer;
+  }
+  @media (prefers-color-scheme: dark) { .check-filter { border-color: #333333; } }
+  .check-filter:hover { border-color: var(--check-red-border); }
+  .check-filter[aria-pressed="true"] {
+    border-color: var(--check-red);
+    background: var(--check-red-soft);
+  }
   .seg-btn.active {
     background: var(--seg-thumb);
     color: var(--seg-icon-active);
@@ -408,7 +428,7 @@
         <span>Stroke 1.5 &middot; Radius 2 medium &middot; Join round</span>
       </div>
       <input id="search" type="text" placeholder="Filter by icon name&hellip;" autocomplete="off" />
-      <div class="segmented" role="radiogroup" aria-label="View"><button type="button" class="seg-btn active" data-view="list" role="radio" aria-checked="true" aria-label="List view" title="List view"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h.01"></path><path d="M3 12h.01"></path><path d="M3 19h.01"></path><path d="M8 5h13"></path><path d="M8 12h13"></path><path d="M8 19h13"></path></svg></button><button type="button" class="seg-btn" data-view="gallery" role="radio" aria-checked="false" aria-label="Gallery view" title="Show only the icons picked in the Iconists column, as a grid"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="14" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect></svg></button></div>
+      <div class="segmented" role="radiogroup" aria-label="View"><button type="button" class="seg-btn active" data-view="list" role="radio" aria-checked="true" aria-label="List view" title="List view"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h.01"></path><path d="M3 12h.01"></path><path d="M3 19h.01"></path><path d="M8 5h13"></path><path d="M8 12h13"></path><path d="M8 19h13"></path></svg></button><button type="button" class="seg-btn" data-view="gallery" role="radio" aria-checked="false" aria-label="Gallery view" title="Show only the icons picked in the Iconists column, as a grid"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="14" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect></svg></button></div><button type="button" id="checked-filter" class="check-filter" aria-pressed="false" aria-label="Show only checked icons" title="Show only checked icons"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></button>
     </div>
   </div>
 </header>
@@ -9038,11 +9058,13 @@
   const emptyState = document.getElementById('empty-state');
   const emptyQuery = document.getElementById('empty-query');
 
+  const checkedFilter = document.getElementById('checked-filter');
   function applyFilters() {
     const q = search.value.trim().toLowerCase();
+    const checkedOnly = checkedFilter.getAttribute('aria-pressed') === 'true';
     let visible = 0;
     rows.forEach(row => {
-      const show = !q || row.dataset.search.includes(q);
+      const show = (!q || row.dataset.search.includes(q)) && (!checkedOnly || row.querySelector('td.col-check .check-chip'));
       row.classList.toggle('row-hidden', !show);
       if (show) visible++;
     });
@@ -9231,6 +9253,7 @@
   function revealRows(targets) {
     if (targets.some(r => r.classList.contains('row-hidden'))) {
       search.value = '';
+      checkedFilter.setAttribute('aria-pressed', 'false');
       applyFilters();
     }
     document.querySelector('.seg-btn[data-view="list"]').click();
@@ -9254,6 +9277,12 @@
   }));
 
   search.addEventListener('input', applyFilters);
+  checkedFilter.addEventListener('click', () => {
+    const on = checkedFilter.getAttribute('aria-pressed') !== 'true';
+    checkedFilter.setAttribute('aria-pressed', on);
+    if (on) document.querySelector('.seg-btn[data-view="list"]').click();
+    applyFilters();
+  });
 </script>
 
 </body>
